@@ -4,6 +4,11 @@ services:
     image: telegraf:1.18-alpine
     volumes:
     - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    - ./logs/telegraf/telegraf.log:/var/log/telegraf/telegraf.log
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /var/run/utmpx:/var/run/utmp:ro
+    privileged: true
+#    command: chown telegraf /var/run/docker.sock
     depends_on:
       - influxdb
     links:
@@ -34,6 +39,94 @@ services:
       - ./grafana/provisioning/:/etc/grafana/provisioning/
       - ./grafana/dashboards/:/var/lib/grafana/dashboards/
 
+  app:
+    build:
+      context: ./Dockerfiles/php
+      dockerfile: Dockerfile
+    restart: always
+    container_name: app
+    environment:
+      UID_VAR: 501
+      GID_VAR: 20
+      DATABASE_HOST: db
+      DATABASE_SERVER_VERSION: 10
+      DATABASE_PORT: &pg-port 5432
+      DATABASE_NAME: &pg-db-name engular
+      DATABASE_USER: &pg-username engular_usr
+      DATABASE_PASSWORD: &pg-password 123qwe
+      PHP_IDE_CONFIG: "serverName=Engular"
+    ports:
+      - 9000:9000
+    working_dir: /var/www/engular
+    volumes:
+      - ./Dockerfiles/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ../../../dev/Engular/engular-admin:/var/www/engular:cached
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    container_name: nginx
+    ports:
+      - '127.0.0.1:80:80'
+    depends_on:
+      - app
+    volumes:
+      - ../../../dev/Engular/engular-admin:/var/www/engular:cached
+      - ./Dockerfiles/nginx/nginx.conf:/etc/nginx/nginx.conf
+
+  db:
+    image: reg.asqq.io/engular/docker-engular/postgresql:10.4
+    container_name: engular-db
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_DB: *pg-db-name
+      POSTGRES_USER: *pg-username
+      POSTGRES_PASSWORD: *pg-password
+    ports:
+      - '5432:5432'
+    expose:
+      - *pg-port
+    volumes:
+      - ../../../dev/Engular/engular-pgdata:/pgdata
+
+  redis:
+    image: redis:3.2
+    container_name: redis
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    container_name: elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
+  mongodb:
+    image: mongo:4.2.3-bionic
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=test
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+
 volumes:
   grafana_data: {}
   influxdb_data: {}
+  elasticsearch_data: {}
+  mongo_data: {}
