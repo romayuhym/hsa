@@ -41,8 +41,8 @@ services:
 
   app:
     build:
-      context: ./Dockerfiles/php
-      dockerfile: Dockerfile
+      context: Dockerfiles/php
+      dockerfile: Dockerfiles/php/Dockerfile
     restart: always
     container_name: app
     environment:

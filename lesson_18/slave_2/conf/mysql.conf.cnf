@@ -1,0 +1,9 @@
+[mysqld]
+
+skip-host-cache
+skip-name-resolve
+
+server-id=3
+relay-log = /var/lib/mysql/mysql-relay-bin.log
+log_bin = /var/lib/mysql/mysql-bin-master.log
+binlog_do_db = mydb
