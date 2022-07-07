@@ -88,10 +88,10 @@ CREATE
 Time 2289.37 seconds ~ 38 min
 
 ### CPU & RAM & Network used by container 
-![CPU & RAM & Network used by container](report_img/container_with_sharding.pngaw=true "CPU & RAM & Network used by container with sharding")
+![CPU & RAM & Network used by container](./report_img/container_with_sharding.png "CPU & RAM & Network used by container with sharding")
 
 ### Postrges param
-![Postrges param](report_img/postgres_with_sharding.pngaw=true "Postrges param with sharding")
+![Postrges param](./report_img/postgres_with_sharding.png "Postrges param with sharding")
 
 ## Insert 1 000 000 rows into books without sharding
 
@@ -106,8 +106,8 @@ Time 1337.23 seconds ~ 22 min
 ## Compare performance
 
 ### CPU & RAM & Network used by container 
-![CPU & RAM & Network used by container](report_img/Screenshot 2022-07-07 at 14.43.52.png "CPU & RAM & Network used by container compare performance")
+![CPU & RAM & Network used by container](./report_img/container_compare.png "CPU & RAM & Network used by container compare performance")
 
 ### Postrges param
-![Postrges param](report_img/Screenshot 2022-07-07 at 14.44.12.png "Postrges param compare performance")
+![Postrges param](./report_img/postgres_compare.png "Postrges param compare performance")
 
