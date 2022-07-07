@@ -1,0 +1,86 @@
+version: '3.6'
+services:
+  telegraf:
+    image: telegraf:1.18-alpine
+    volumes:
+    - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    - ./logs/telegraf:/var/log/telegraf
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /var/run/utmpx:/var/run/utmp:ro
+    privileged: true
+    user: root
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    ports:
+    - '127.0.0.1:8125:8125/udp'
+
+  influxdb:
+    image: influxdb:1.8-alpine
+    env_file: configuration.env
+    ports:
+      - '127.0.0.1:8086:8086'
+    volumes:
+      - ./:/imports
+      - influxdb_data:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana:8.0.2
+    depends_on:
+      - influxdb
+    env_file: configuration.env
+    links:
+      - influxdb
+    ports:
+      - '127.0.0.1:3000:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/dashboards/:/var/lib/grafana/dashboards/
+
+  postgresql-b:
+    image: postgres:14.4
+    container_name: postgresql-b
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_DB: mydb
+      POSTGRES_USER: db_usr
+      POSTGRES_PASSWORD: db_pwd
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg_data:/pgdata
+
+  postgresql-b1:
+    image: postgres:14.4
+    container_name: postgresql-b1
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_DB: mydb
+      POSTGRES_USER: db_usr
+      POSTGRES_PASSWORD: db_pwd
+    ports:
+      - '6543:5432'
+    volumes:
+      - pg_data_1:/pgdata
+
+  postgresql-b2:
+    image: postgres:14.4
+    container_name: postgresql-b2
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_DB: mydb
+      POSTGRES_USER: db_usr
+      POSTGRES_PASSWORD: db_pwd
+    ports:
+      - '7654:5432'
+    volumes:
+      - pg_data_2:/pgdata
+
+volumes:
+  pg_data: {}
+  pg_data_1: {}
+  pg_data_2: {}
+  influxdb_data: {}
+  grafana_data: {}
