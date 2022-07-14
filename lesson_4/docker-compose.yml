@@ -1,0 +1,64 @@
+version: '3.6'
+services:
+  telegraf:
+    image: telegraf:1.18-alpine
+    volumes:
+    - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    - ./logs/telegraf/telegraf.log:/var/log/telegraf/telegraf.log
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /var/run/utmpx:/var/run/utmp:ro
+    privileged: true
+    user: root
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    ports:
+    - '127.0.0.1:8125:8125/udp'
+
+  influxdb:
+    image: influxdb:1.8-alpine
+    env_file: configuration.env
+    ports:
+      - '127.0.0.1:8086:8086'
+    volumes:
+      - ./:/imports
+      - influxdb_data:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana:8.0.2
+    depends_on:
+      - influxdb
+    env_file: configuration.env
+    links:
+      - influxdb
+    ports:
+      - '127.0.0.1:3000:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/dashboards/:/var/lib/grafana/dashboards/
+
+  postgresql:
+    image: postgres:14.4
+    container_name: postgresql
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_DB: mydb
+      POSTGRES_USER: db_usr
+      POSTGRES_PASSWORD: db_pwd
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg_data:/pgdata
+
+  redis:
+    image: redis:4.0
+    container_name: redis
+    ports:
+      - '6379:6379'
+
+volumes:
+  grafana_data: {}
+  influxdb_data: {}
+  pg_data: {}

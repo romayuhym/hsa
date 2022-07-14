@@ -1,0 +1,60 @@
+siege -c10 -v -t180s -f get_url.txt
+
+Transactions:                   2723 hits
+Availability:                 100.00 %
+Elapsed time:                 179.33 secs
+Data transferred:               0.20 MB
+Response time:                  0.66 secs
+Transaction rate:              15.18 trans/sec
+Throughput:                     0.00 MB/sec
+Concurrency:                    9.98
+Successful transactions:        2723
+Failed transactions:               0
+Longest transaction:            1.01
+Shortest transaction:           0.31
+
+
+siege -c25 -v -t180s -f get_url.txt
+
+Transactions:                   6798 hits
+Availability:                 100.00 %
+Elapsed time:                 179.48 secs
+Data transferred:               0.51 MB
+Response time:                  0.66 secs
+Transaction rate:              37.88 trans/sec
+Throughput:                     0.00 MB/sec
+Concurrency:                   24.94
+Successful transactions:        6798
+Failed transactions:               0
+Longest transaction:            1.06
+Shortest transaction:           0.30
+
+siege -c50 -v -t180s -f get_url.txt
+
+Transactions:                  10892 hits
+Availability:                 100.00 %
+Elapsed time:                 179.53 secs
+Data transferred:               0.81 MB
+Response time:                  0.76 secs
+Transaction rate:              60.67 trans/sec
+Throughput:                     0.00 MB/sec
+Concurrency:                   45.99
+Successful transactions:       10892
+Failed transactions:               0
+Longest transaction:           90.27
+Shortest transaction:           0.31
+
+siege -c100 -v -t180s -f get_url.txt
+
+Transactions:                  10836 hits
+Availability:                 100.00 %
+Elapsed time:                 179.92 secs
+Data transferred:               0.81 MB
+Response time:                  0.73 secs
+Transaction rate:              60.23 trans/sec
+Throughput:                     0.00 MB/sec
+Concurrency:                   44.26
+Successful transactions:       10836
+Failed transactions:               0
+Longest transaction:           76.39
+Shortest transaction:           0.00
