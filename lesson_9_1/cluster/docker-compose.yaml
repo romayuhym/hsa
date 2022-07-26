@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  redis-master:
+    image: redis:6-alpine
+    volumes:
+      - redis-m:/data
+      - "./redis-m.conf:/usr/local/etc/redis/redis.conf"
+    ports:
+      - "6379:6379"
+    networks:
+      - redis-cluster
+
+  redis-slave:
+    image: redis:6-alpine
+    command: redis-server --slaveof redis-master 6379
+    links:
+      - redis-master
+    volumes:
+      - redis-s:/data
+    ports:
+      - "6370:6379"
+    networks:
+      - redis-cluster
+
+volumes:
+  redis-m: {}
+  redis-s: {}
+
+networks:
+  redis-cluster:
+    driver: bridge
