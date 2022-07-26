@@ -1,0 +1,51 @@
+### Reindex the data from the words index to autocomplete index
+POST {{host}}/_reindex
+Content-Type: application/json
+Accept: */*
+
+{
+ "source": {
+   "index": "words"
+ },
+ "dest": {
+   "index": "autocomplete"
+ }
+}
+
+### EXAMPLE WITH STRICT MATCH:
+GET {{host}}/autocomplete/_search
+Content-Type: application/json
+Accept: */*
+
+{
+   "size": 5,
+   "query": {
+       "multi_match": {
+           "query": "booba",
+           "type": "bool_prefix",
+           "fields": [
+               "txt*"
+           ]
+       }
+   }
+}
+
+### EXAMPLE WITH TYPOS:
+GET {{host}}/words/_search
+Content-Type: application/json
+Accept: */*
+
+{
+  "query": {
+    "fuzzy": {
+      "txt": {
+        "value": "spplr",
+        "fuzziness": 2,
+        "max_expansions": 50,
+        "prefix_length": 0,
+        "transpositions": true,
+        "rewrite": "constant_score"
+      }
+    }
+  }
+}
