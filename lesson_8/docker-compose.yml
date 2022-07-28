@@ -1,0 +1,19 @@
+version: '3.6'
+
+services:
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=mydb
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_ROOT_PASSWORD=admin
+    volumes:
+      - ./mysql/db.cnf:/etc/mysql/conf.d/db.cnf
+      - db:/var/lib/mysql
+
+volumes:
+  db:
+    driver: local
