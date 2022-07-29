@@ -1,0 +1,28 @@
+version: '3.6'
+
+services:
+  beanstalkd:
+    image: schickling/beanstalkd:latest
+    ports:
+      - "11300:11300"
+  redis-aof:
+    image: redis:6-alpine
+    volumes:
+      - redis-aof:/data
+      - ./config/redis-aof.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+
+  redis-rdb:
+    image: redis:6-alpine
+    volumes:
+      - redis-rdb:/data
+      - ./config/redis-rdb.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6378:6379"
+
+volumes:
+  redis-aof:
+    driver: local
+  redis-rdb:
+    driver: local
