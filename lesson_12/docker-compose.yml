@@ -1,0 +1,61 @@
+version: '3.6'
+services:
+  nginx:
+    image: karljohns0n/nginx-more
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/geo/GeoLite2-Country.mmdb:/var/lib/GeoIP/GeoLite2-Country.mmdb
+    ports:
+      - "8080:80"
+    networks:
+      - servers
+
+  server_uk:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=UK
+    networks:
+      - servers
+  server_us1:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=US1
+    networks:
+      - servers
+  server_us2:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=US2
+    networks:
+      - servers
+  server_rest:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=REST
+    networks:
+      - servers
+  server_backup:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=BACKUP
+    networks:
+      - servers
+
+networks:
+  servers:
+    driver: bridge
