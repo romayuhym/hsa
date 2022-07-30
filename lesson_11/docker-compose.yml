@@ -1,0 +1,106 @@
+version: '3.6'
+services:
+  bind:
+    image: sameersbn/bind
+    environment:
+      - WEBMIN_ENABLED=false
+      - BIND_USER=root
+    volumes:
+      - ./bind/data:/data
+      - ./bind/bind/etc/named.conf:/data/bind/etc/named.conf
+      - ./bind/bind/etc/geo/GeoLite2-Country.mmdb:/data/bind/etc/geo/GeoLite2-Country.mmdb
+      - ./bind/bind/etc/zones/global.cdn.hsa-mytest.local:/data/bind/etc/zones/global.cdn.hsa-mytest.local
+      - ./bind/bind/etc/zones/us.cdn.hsa-mytest.local:/data/bind/etc/zones/us.cdn.hsa-mytest.local
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    networks:
+      servers:
+        ipv4_address: 172.24.2.2
+
+  nginx_us:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx_us.conf:/etc/nginx/conf.d/default.conf
+    tmpfs:
+      - /var/tmp/cache
+    ports:
+      - "80"
+    networks:
+      servers:
+        ipv4_address: 172.24.2.10
+  nginx_global:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx_global.conf:/etc/nginx/conf.d/default.conf
+    tmpfs:
+      - /var/tmp/cache
+    ports:
+      - "80"
+    networks:
+      servers:
+        ipv4_address: 172.24.2.20
+
+  server_global1:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=GLOBAL1
+    networks:
+      - servers
+  server_global2:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=GLOBAL2
+    networks:
+      - servers
+  server_global3:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=GLOBAL3
+    networks:
+      - servers
+  server_us1:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=US1
+    networks:
+      - servers
+  server_us2:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=US2
+    networks:
+      - servers
+  server_us3:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    environment:
+      - SERVER=US3
+    networks:
+      - servers
+
+networks:
+  servers:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.24.2.0/16"
+          gateway: 172.24.2.1
